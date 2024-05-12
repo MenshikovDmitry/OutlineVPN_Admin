@@ -3,8 +3,9 @@
 ## Description
 
 This project is a proxy wrapper around the [OutlineVPN API](https://github.com/jadolg/outline-vpn-api). It allows to manage VPN keys, set data limits, and monitor usage.  
-At this point it is very basic admin panel.
- 
+At this point it is very basic admin panel.  
+![screenshot](https://github.com/MenshikovDmitry/OutlineVPN_Admin/raw/master/screenshot.png)  
+  
  **!!WARNING!!: This application is not secured and should not be exposed to the Internet directly. It must be placed behind a reverse proxy that handles authentication. Failure to do so can expose sensitive information and potentially allow unauthorized access.**
 
 ## Installation
