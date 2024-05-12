@@ -2,7 +2,7 @@ from flask import Flask, render_template
 from flask_restful import Api
 from flask_cors import CORS
 
-from config import WEBSITE_API_URL, PORT
+from config import WEBSITE_API_URL
 from outline_admin.outline_resource import OutlineResource
 
 import logging
@@ -26,4 +26,4 @@ app = create_app()
 
 if __name__ == "__main__":
     LOG.info(f"Starting the Outline Admin backend.")
-    app.run(host="0.0.0.0", port=PORT)
+    app.run(host="0.0.0.0", port=8000)
