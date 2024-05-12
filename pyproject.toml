@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "outline admin"
+version = "0.1.0"
+description = ""
+authors = ["dima <menshikov.dmitry@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+flask = "^3.0.3"
+outline-vpn-api = {git = "https://github.com/jadolg/outline-vpn-api"}
+flask-restful = "^0.3.10"
+flask-cors = "^4.0.1"
+gunicorn = "^22.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

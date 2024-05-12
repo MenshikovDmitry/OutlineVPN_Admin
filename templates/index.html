@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outline Keys</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h2>Outline Keys</h2>
+
+    <form id="createKeyForm" onsubmit="event.preventDefault(); createKey();">
+        <input type="text" id="name" placeholder="Name" required>
+        <input type="number" id="dataLimit" placeholder="Data Limit (MB)">
+        <button type="submit">Create Key</button>
+    </form>
+
+    <table id="keysTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Data Limit (MB)</th>
+                <th>Data Usage (%)</th>
+                <th>Action</th>
+                <th>Access URL</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Table rows will be dynamically generated here -->
+        </tbody>
+    </table>
+
+    <script>
+        // Function to fetch data from the API and populate the table
+        var API_URL = `{{ API_URL }}`;
+        function fetchDataAndPopulateTable() {
+            fetch(API_URL + '/api/outline/get_keys')
+                .then(response => response.json())
+                .then(data => {
+                    var tableBody = document.querySelector('#keysTable tbody');
+                    tableBody.innerHTML = ''; // Clear existing table rows
+                    data.keys.forEach(function(key) {
+                        var dataUsage = key.used_bytes / key.data_limit * 100;
+                        var row = '<tr>';
+                        row += '<td>' + key.key_id + '</td>';
+                        row += '<td>' + key.name + '</td>';
+                        row += '<td>' + (key.data_limit !== null ? key.data_limit_mb : 'N/A') + '</td>';
+                        row += '<td>' + key.usage + '% </td>';
+                        row += '<td><button onclick="deleteKey(\'' + key.key_id + '\')">Delete</button> <button onclick="setDataLimit(\'' + key.key_id + '\')">Set Data Limit</button></td>';
+                        row += '<td><button onclick="copyToClipboard(\'' + key.access_url + '\')">Copy URL</button></td>';
+                        row += '</tr>';
+                        tableBody.innerHTML += row;
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+function setDataLimit(keyId) {
+    const dataLimit = prompt("Please enter the new data limit (MB):");
+    if (dataLimit !== null && dataLimit !== "") {
+        fetch(API_URL + `/api/outline/set_data_limit`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ key_id: keyId, data_limit_mb: parseInt(dataLimit) }),
+        })
+        .then(response => {
+            if (response.ok) {
+                fetchDataAndPopulateTable();
+            } else {
+                alert('Failed to set data limit');
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+}
+
+        function createKey() {
+            const name = document.getElementById('name').value;
+            const dataLimit = document.getElementById('dataLimit').value;
+
+            let requestBody = { name: name };
+            if (dataLimit !== "") {
+                requestBody.data_limit_mb = dataLimit;
+            }
+
+            fetch(API_URL + '/api/outline/create_key', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+            })
+            .then(response => {
+                if (response.ok) {
+                    fetchDataAndPopulateTable();
+                } else {
+                    alert('Failed to create key');
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+function deleteKey(keyId) {
+    if (confirm('Are you sure you want to delete this key?')) {
+        fetch(API_URL + `/api/outline/remove_key`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ key_id: keyId }),
+        })
+        .then(response => {
+            if (response.ok) {
+                fetchDataAndPopulateTable();
+            } else {
+                alert('Failed to delete key');
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+}
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert('Access URL copied to clipboard');
+            }).catch(function(error) {
+                alert('Failed to copy Access URL');
+            });
+        }
+
+        // Call the function to fetch data and populate the table when the page loads
+        window.onload = fetchDataAndPopulateTable;
+    </script>
+</body>
+</html>

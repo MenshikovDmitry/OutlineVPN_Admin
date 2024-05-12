@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  outline_admin:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - API_URL=https://192.168.0.2:5858/api # URL of the outline API endpoint
+      - API_TOKEN=<SECRET_TOKEN> # cert_sha256 for outline API access
+      - HOSTNAME=localhost # hostname of this service. needed for the Frontend to know where to connect to
